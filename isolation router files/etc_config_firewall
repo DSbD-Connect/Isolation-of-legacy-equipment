@@ -1,0 +1,123 @@
+
+config defaults
+	option input 'ACCEPT'
+	option output 'ACCEPT'
+	option forward 'REJECT'
+	option synflood_protect '1'
+
+config zone
+	option name 'lan'
+	list network 'lan'
+	option input 'REJECT'
+	option output 'REJECT'
+	option forward 'ACCEPT'
+
+config zone
+	option name 'tan'
+	list network 'tan'
+	option input 'ACCEPT'
+	option output 'ACCEPT'
+	option forward 'ACCEPT'
+
+config zone
+	option name 'wan'
+	list network 'wan'
+	list network 'wan6'
+	option input 'REJECT'
+	option output 'ACCEPT'
+	option forward 'REJECT'
+	option masq '1'
+	option mtu_fix '1'
+
+config redirect
+        option name 'allow-smb-on-port-445'
+	option target 'DNAT'
+	option src 'tan'
+	option dest 'lan'
+	option proto 'tcp'
+	option src_dport '445'
+	option dest_ip '192.168.1.4'
+	option dest_port '445'
+
+config redirect
+        option name 'allow-smb-on-port-139'
+	option target 'DNAT'
+	option src 'tan'
+	option dest 'lan'
+	option proto 'tcp'
+	option src_dport '139'
+	option dest_ip '192.168.1.4'
+	option dest_port '139'
+
+config redirect
+        option name 'allow-scan-control-on-port-5533'
+	option target 'DNAT'
+	option src 'tan'
+	option dest 'lan'
+	option proto 'udp'
+	option src_dport '5533'
+	option dest_ip '192.168.1.4'
+	option dest_port '5533'
+
+# This rule would not be present on a real system,
+# where ssh access would only be permitted on the
+# secure TAN. However, for practicality when working
+# on or using the demonstrator, it is useful to have
+# ssh access from the LAN.
+config rule
+	option name 'allow-lan-ssh'
+	option src 'lan'
+	option proto 'tcp'
+	option dest_port '22'
+	option target 'ACCEPT'
+	option family 'ipv4'
+
+config rule
+	option name 'allow-connect-from-wan'
+	option src 'wan'
+	option proto 'udp'
+	option dest_port '19666'
+	option family 'ipv4'
+	option target 'ACCEPT'
+	
+config rule
+	option name 'allow-lan-DHCP-in'
+	option src 'lan'
+	option proto 'udp'
+	option dest_port '67'
+	option target 'ACCEPT'
+	option family 'ipv4'
+
+config rule
+	option name 'allow-lan-DHCP-out'
+	option dest 'lan'
+	option proto 'udp'
+	option src_port '67'
+	option target 'ACCEPT'
+	option family 'ipv4'
+	
+## the rules below here are copied from the original config ##
+
+config rule
+	option name 'Allow-DHCP-Renew'
+	option src 'wan'
+	option proto 'udp'
+	option dest_port '68'
+	option family 'ipv4'
+	option target 'ACCEPT'
+
+config rule
+	option name 'Allow-Ping'
+	option src 'wan'
+	option proto 'icmp'
+	option icmp_type 'echo-request'
+	option family 'ipv4'
+	option target 'ACCEPT'
+
+config rule
+	option name 'Allow-IGMP'
+	option src 'wan'
+	option proto 'igmp'
+	option family 'ipv4'
+	option target 'ACCEPT'
+

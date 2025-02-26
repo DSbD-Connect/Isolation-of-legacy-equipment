@@ -1,0 +1,7 @@
+config cyberhive-connect
+option server 'https://uk1.connect.cyberhive.com/'
+option username 'xxx@xxx.xxx'
+option CONNECT_AUTH_TOKEN 'xxxxxxxxxxxxxxxxxx'
+option CONNECT_OVERRIDE_HOSTNAME 'shadow-router-1'
+option CONNECT_KEY_DIR '/root/cyberhive-connect-config'
+option CONNECT_LISTEN_PORT '19666'

@@ -1,0 +1,59 @@
+#!/bin/sh /etc/rc.common
+# cyberhive-connect script
+
+
+USE_PROCD=1
+
+START=90
+STOP=10
+
+NAME=cyberhive-connect
+PROG=/usr/sbin/cyberhive-connect
+
+
+start_service() {
+
+local server username auth_token override_hostname key_dir
+
+
+echo Starting ${NAME}
+
+# config
+procd_set_param file /etc/config/cyberhive-connect
+server=$(uci -q get cyberhive-connect.@cyberhive-connect[0].server)
+username=$(uci -q get cyberhive-connect.@cyberhive-connect[0].username)
+auth_token=$(uci -q get cyberhive-connect.@cyberhive-connect[0].CONNECT_AUTH_TOKEN)
+override_hostname=$(uci -q get cyberhive-connect.@cyberhive-connect[0].CONNECT_OVERRIDE_HOSTNAME)
+key_dir=$(uci -q get cyberhive-connect.@cyberhive-connect[0].CONNECT_KEY_DIR)
+listen_port=$(uci -q get cyberhive-connect.@cyberhive-connect[0].CONNECT_LISTEN_PORT)
+
+
+procd_set_param respawn
+
+# command
+procd_open_instance
+procd_set_param command ${PROG}
+procd_append_param command -u ${username}
+procd_append_param command -s ${server}
+
+# set env vars for service
+procd_set_param env CONNECT_AUTH_TOKEN=${auth_token}
+procd_append_param env CONNECT_OVERRIDE_HOSTNAME=${override_hostname}
+procd_append_param env CONNECT_KEY_DIR=${key_dir}
+procd_append_param env CONNECT_LISTEN_PORT=${listen_port}
+
+# output
+procd_set_param stdout 1
+procd_set_param stderr 1
+
+
+
+procd_close_instance
+}
+
+
+stop_service() {
+echo Stopping ${NAME} on pid $(pidof "${NAME}")
+# procd handles the termination - don't need to do it explicitly here
+
+}
